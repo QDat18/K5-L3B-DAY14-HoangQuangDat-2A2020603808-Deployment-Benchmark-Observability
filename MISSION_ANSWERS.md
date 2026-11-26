@@ -223,8 +223,14 @@ referrer-policy: strict-origin-when-cross-origin
 
 ## Part 3: Cloud Deployment
 
-### Exercise 3.1 / 3.2: Deploy `06-lab-complete/` lên Cloud
-- **Public URL:** *(điền sau khi deploy xong)*
+### Exercise 3.1 / 3.2: Deploy `06-lab-complete/` lên Cloud (Render)
+- **Public URL:** `https://k5-l3b-day14-hoangquangdat-2a2020603808.onrender.com`
+- **Nền tảng:** Render (Web Service Docker + Render Key Value Redis)
+- **Kết quả 4 lệnh tự kiểm CP6:**
+  - `GET /health` → `200`
+  - `GET /ready` → `200` (`{"ready":true}`)
+  - `POST /ask` (không có `X-API-Key`) → `401`
+  - `POST /ask` (có `X-API-Key`) → `200`
 - **Screenshots:** `screenshots/dashboard.png`, `screenshots/running.png`, `screenshots/test.png`
 
 ### So sánh `railway.toml` vs `render.yaml`
@@ -245,3 +251,15 @@ Từ `cloudbuild.yaml` và `service.yaml`, pipeline CI/CD chạy tự động kh
 4. **`deploy`:** Dùng `gcloud run deploy` triển khai lên Cloud Run (`asia-southeast1`), cấu hình autoscale (`min-instances=1` tránh cold start, `max-instances=10`), tài nguyên (`512Mi` RAM, `1` CPU), inject secret từ Secret Manager, và `service.yaml` bổ sung `livenessProbe` (`/health`) + `startupProbe` (`/ready`).
 
 ---
+
+## AI Log
+
+- **Công cụ sử dụng:** Antigravity (trợ lý AI trong IDE).
+- **Nội dung hỏi & nhận hỗ trợ:**
+  1. **Part 1–5:** Chạy các ví dụ mẫu theo lưu ý K5, tổng hợp output `curl -i`, đo dung lượng Docker image và giải thích cơ chế stateless/security/scaling.
+  2. **Part 6 (`06-lab-complete/`):** Gợi ý cài đặt `config.py`, `redis_client.py`, `auth.py`, `rate_limiter.py` (sliding window Redis), `cost_guard.py`, `main.py` (JSON logging, `/health`, `/ready`, `/ask`), `Dockerfile` multi-stage, `docker-compose.yml`, `railway.toml`, `render.yaml`.
+  3. **Part 7 (`benchmark-observability/`):** Hỗ trợ chạy `load_test.py`, `run_eval.py`, bổ sung `KNOWLEDGE_BASE` cho 2 câu `security-02` và `scaling-03`, sửa lỗi path `/app/.local` trong `production/Dockerfile` của stack observability và tổng hợp số liệu từ JSON/CSV vào `BENCHMARK_REPORT.md`.
+- **Tự kiểm tra:**
+  - Tự chạy `check_production_ready.py` (đạt 42/42 checks trên Windows; cần chạy trên WSL2 Ubuntu để kiểm tra `SIGTERM` cho `PASS 12/12`).
+  - Tự deploy lên Render và kiểm tra 4 lệnh CP6 trên URL public (`200 / 200 / 401 / 200`).
+  - Đối chiếu toàn bộ số liệu trong `BENCHMARK_REPORT.md` khớp 100% với các file trong `reports/` và `benchmark-results/`.
